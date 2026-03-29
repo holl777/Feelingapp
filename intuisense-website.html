@@ -1,0 +1,1093 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IntuiSense — Teste ton sixième sens</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Bricolage+Grotesque:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+  --c1:#FF5757; --c2:#FFD166; --c3:#06D6A0; --c4:#4CC9F0;
+  --c5:#F77F00; --c6:#9B5DE5; --c7:#FF69B4;
+  --bg:#07070F; --bg2:#0E0E1C; --card:#13131F;
+  --border:rgba(255,255,255,0.07);
+  --text:#F2F2FF; --muted:#6B6B8A;
+  --glow1:rgba(255,87,87,0.25); --glow6:rgba(155,93,229,0.25);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  font-family:'Bricolage Grotesque',sans-serif;
+  background:var(--bg);color:var(--text);
+  overflow-x:hidden;cursor:none;
+}
+
+/* ===== CUSTOM CURSOR ===== */
+#cursor{
+  position:fixed;width:18px;height:18px;border-radius:50%;
+  background:var(--c6);mix-blend-mode:screen;
+  pointer-events:none;z-index:9999;
+  transition:transform 0.12s ease,opacity 0.3s;
+  transform:translate(-50%,-50%);
+}
+#cursor-trail{
+  position:fixed;width:36px;height:36px;border-radius:50%;
+  border:1.5px solid rgba(155,93,229,0.4);
+  pointer-events:none;z-index:9998;
+  transition:transform 0.25s ease,opacity 0.3s;
+  transform:translate(-50%,-50%);
+}
+
+/* ===== PARTICLES BG ===== */
+#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;}
+
+/* ===== NAV ===== */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  padding:18px 40px;
+  display:flex;align-items:center;justify-content:space-between;
+  background:rgba(7,7,15,0.8);
+  backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+  transition:all 0.3s;
+}
+.nav-logo{
+  font-family:'Syne',sans-serif;font-weight:800;font-size:1.3rem;
+  background:linear-gradient(135deg,var(--c1),var(--c6));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  letter-spacing:-0.5px;
+}
+.nav-links{display:flex;gap:32px;list-style:none;}
+.nav-links a{
+  color:var(--muted);text-decoration:none;font-weight:500;font-size:0.9rem;
+  transition:color 0.2s;letter-spacing:0.5px;
+}
+.nav-links a:hover{color:var(--text);}
+.nav-cta{
+  background:linear-gradient(135deg,var(--c1),var(--c6));
+  border:none;border-radius:12px;padding:10px 22px;
+  color:white;font-family:'Syne',sans-serif;font-weight:700;
+  font-size:0.9rem;cursor:pointer;
+  transition:all 0.2s;
+}
+.nav-cta:hover{transform:scale(1.05);box-shadow:0 0 20px var(--glow1);}
+
+/* ===== SECTIONS ===== */
+section{position:relative;z-index:1;}
+
+/* ===== HERO ===== */
+#hero{
+  min-height:100vh;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;padding:120px 24px 80px;
+  overflow:hidden;
+}
+.hero-eyebrow{
+  display:inline-flex;align-items:center;gap:8px;
+  background:rgba(155,93,229,0.12);
+  border:1px solid rgba(155,93,229,0.3);
+  border-radius:50px;padding:7px 18px;
+  font-size:0.78rem;font-weight:600;color:var(--c6);
+  letter-spacing:2px;text-transform:uppercase;
+  margin-bottom:28px;
+  animation:fadeUp 0.6s ease both;
+}
+.hero-title{
+  font-family:'Syne',sans-serif;font-weight:800;
+  font-size:clamp(3rem,8vw,7rem);line-height:0.95;
+  letter-spacing:-3px;margin-bottom:24px;
+  animation:fadeUp 0.7s 0.1s ease both;
+}
+.hero-title span{
+  background:linear-gradient(135deg,var(--c1) 0%,var(--c2) 35%,var(--c4) 65%,var(--c6) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  display:block;
+}
+.hero-sub{
+  max-width:520px;color:var(--muted);font-size:1.1rem;
+  line-height:1.7;margin-bottom:44px;font-weight:400;
+  animation:fadeUp 0.7s 0.2s ease both;
+}
+.hero-btns{
+  display:flex;gap:16px;flex-wrap:wrap;justify-content:center;
+  animation:fadeUp 0.7s 0.3s ease both;
+}
+.btn-primary{
+  background:linear-gradient(135deg,var(--c1),var(--c6));
+  border:none;border-radius:16px;padding:16px 36px;
+  color:white;font-family:'Syne',sans-serif;font-weight:700;
+  font-size:1.05rem;cursor:pointer;
+  box-shadow:0 8px 32px var(--glow1);
+  transition:all 0.25s cubic-bezier(0.34,1.56,0.64,1);
+}
+.btn-primary:hover{transform:scale(1.06) translateY(-3px);box-shadow:0 16px 48px var(--glow1);}
+.btn-ghost{
+  background:transparent;border:2px solid var(--border);
+  border-radius:16px;padding:14px 32px;
+  color:var(--text);font-family:'Syne',sans-serif;font-weight:600;
+  font-size:1rem;cursor:pointer;
+  transition:all 0.2s;
+}
+.btn-ghost:hover{border-color:rgba(255,255,255,0.25);transform:translateY(-2px);}
+
+.hero-stats{
+  display:flex;gap:40px;margin-top:64px;
+  animation:fadeUp 0.7s 0.4s ease both;
+  flex-wrap:wrap;justify-content:center;
+}
+.hero-stat-num{
+  font-family:'Syne',sans-serif;font-size:2.2rem;font-weight:800;
+  background:linear-gradient(135deg,var(--c2),var(--c5));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.hero-stat-label{font-size:0.8rem;color:var(--muted);font-weight:500;margin-top:2px;letter-spacing:1px;text-transform:uppercase;}
+
+/* Floating orbs */
+.orb{
+  position:absolute;border-radius:50%;filter:blur(80px);
+  pointer-events:none;animation:orbFloat ease-in-out infinite;
+}
+.orb1{width:500px;height:500px;background:var(--glow6);top:-100px;left:-150px;animation-duration:12s;}
+.orb2{width:350px;height:350px;background:var(--glow1);bottom:-80px;right:-80px;animation-duration:15s;animation-delay:-5s;}
+.orb3{width:200px;height:200px;background:rgba(76,201,240,0.1);top:40%;right:10%;animation-duration:9s;animation-delay:-3s;}
+@keyframes orbFloat{
+  0%,100%{transform:translateY(0) scale(1);}
+  50%{transform:translateY(-30px) scale(1.05);}
+}
+
+/* ===== FEATURES ===== */
+#features{padding:100px 24px;}
+.section-label{
+  font-size:0.75rem;font-weight:700;letter-spacing:3px;
+  text-transform:uppercase;color:var(--c6);margin-bottom:14px;
+}
+.section-title{
+  font-family:'Syne',sans-serif;font-weight:800;
+  font-size:clamp(2rem,5vw,3.5rem);letter-spacing:-1.5px;
+  line-height:1.1;margin-bottom:16px;
+}
+.section-desc{color:var(--muted);font-size:1rem;max-width:500px;line-height:1.7;}
+.features-grid{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+  gap:20px;margin-top:60px;max-width:1100px;margin-left:auto;margin-right:auto;
+}
+.feat-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:24px;padding:28px;
+  transition:all 0.3s cubic-bezier(0.34,1.2,0.64,1);
+  position:relative;overflow:hidden;
+}
+.feat-card::before{
+  content:'';position:absolute;inset:0;opacity:0;
+  transition:opacity 0.3s;
+}
+.feat-card:nth-child(1)::before{background:radial-gradient(circle at 0 0,rgba(255,87,87,0.08),transparent 60%);}
+.feat-card:nth-child(2)::before{background:radial-gradient(circle at 0 0,rgba(255,209,102,0.08),transparent 60%);}
+.feat-card:nth-child(3)::before{background:radial-gradient(circle at 0 0,rgba(6,214,160,0.08),transparent 60%);}
+.feat-card:nth-child(4)::before{background:radial-gradient(circle at 0 0,rgba(76,201,240,0.08),transparent 60%);}
+.feat-card:nth-child(5)::before{background:radial-gradient(circle at 0 0,rgba(155,93,229,0.08),transparent 60%);}
+.feat-card:nth-child(6)::before{background:radial-gradient(circle at 0 0,rgba(255,105,180,0.08),transparent 60%);}
+.feat-card:hover{transform:translateY(-6px);border-color:rgba(255,255,255,0.14);}
+.feat-card:hover::before{opacity:1;}
+.feat-icon{
+  width:52px;height:52px;border-radius:16px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.6rem;margin-bottom:18px;
+}
+.feat-card:nth-child(1) .feat-icon{background:rgba(255,87,87,0.15);}
+.feat-card:nth-child(2) .feat-icon{background:rgba(255,209,102,0.15);}
+.feat-card:nth-child(3) .feat-icon{background:rgba(6,214,160,0.15);}
+.feat-card:nth-child(4) .feat-icon{background:rgba(76,201,240,0.15);}
+.feat-card:nth-child(5) .feat-icon{background:rgba(155,93,229,0.15);}
+.feat-card:nth-child(6) .feat-icon{background:rgba(255,105,180,0.15);}
+.feat-title{font-family:'Syne',sans-serif;font-weight:700;font-size:1.1rem;margin-bottom:8px;}
+.feat-desc{color:var(--muted);font-size:0.88rem;line-height:1.6;}
+
+/* ===== HOW IT WORKS ===== */
+#how{padding:80px 24px;text-align:center;}
+.steps{
+  display:flex;gap:0;margin-top:60px;max-width:900px;
+  margin-left:auto;margin-right:auto;flex-wrap:wrap;justify-content:center;
+}
+.step{flex:1;min-width:180px;max-width:220px;position:relative;padding:0 20px;}
+.step::after{
+  content:'→';position:absolute;right:-10px;top:24px;
+  font-size:1.4rem;color:var(--muted);
+}
+.step:last-child::after{display:none;}
+.step-num{
+  width:56px;height:56px;border-radius:50%;
+  background:linear-gradient(135deg,var(--c6),var(--c4));
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;
+  margin:0 auto 16px;box-shadow:0 0 20px var(--glow6);
+}
+.step-title{font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;margin-bottom:8px;}
+.step-desc{color:var(--muted);font-size:0.83rem;line-height:1.5;}
+
+/* ===== LEVELS TABLE ===== */
+#levels{padding:80px 24px;}
+.levels-grid{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+  gap:12px;margin-top:50px;max-width:900px;margin-left:auto;margin-right:auto;
+}
+.level-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:18px;padding:20px 16px;text-align:center;
+  transition:all 0.25s;
+}
+.level-card:hover{transform:translateY(-4px);border-color:rgba(155,93,229,0.3);}
+.level-card .lv-icon{font-size:2rem;margin-bottom:8px;}
+.level-card .lv-name{font-family:'Syne',sans-serif;font-weight:700;font-size:0.95rem;margin-bottom:4px;}
+.level-card .lv-xp{font-size:0.75rem;color:var(--muted);font-weight:500;}
+
+/* ===== TESTIMONIALS (fun fake ones) ===== */
+#testimonials{padding:80px 24px;overflow:hidden;}
+.testi-track{
+  display:flex;gap:20px;width:max-content;
+  animation:scroll-left 28s linear infinite;
+}
+.testi-track:hover{animation-play-state:paused;}
+@keyframes scroll-left{
+  0%{transform:translateX(0);}
+  100%{transform:translateX(-50%);}
+}
+.testi-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:20px;padding:24px;width:280px;flex-shrink:0;
+}
+.testi-stars{color:var(--c2);font-size:0.9rem;margin-bottom:10px;}
+.testi-text{font-size:0.88rem;line-height:1.6;color:#C0C0D8;margin-bottom:16px;}
+.testi-author{display:flex;align-items:center;gap:10px;}
+.testi-avatar{
+  width:36px;height:36px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.1rem;flex-shrink:0;
+}
+.testi-name{font-weight:700;font-size:0.85rem;}
+.testi-handle{font-size:0.75rem;color:var(--muted);}
+
+/* ===== CTA SECTION ===== */
+#cta{padding:80px 24px;text-align:center;}
+.cta-box{
+  max-width:700px;margin:0 auto;
+  background:var(--card);border:1px solid var(--border);
+  border-radius:32px;padding:60px 40px;
+  position:relative;overflow:hidden;
+}
+.cta-box::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(circle at 50% 0,rgba(155,93,229,0.12),transparent 60%);
+}
+.cta-title{
+  font-family:'Syne',sans-serif;font-weight:800;
+  font-size:clamp(2rem,5vw,3rem);letter-spacing:-1px;
+  margin-bottom:14px;position:relative;z-index:1;
+}
+.cta-desc{color:var(--muted);font-size:1rem;margin-bottom:32px;position:relative;z-index:1;}
+.cta-emoji{font-size:3.5rem;margin-bottom:20px;position:relative;z-index:1;}
+
+/* ===== GAME MODAL ===== */
+#game-overlay{
+  position:fixed;inset:0;z-index:200;
+  background:rgba(7,7,15,0.97);
+  backdrop-filter:blur(16px);
+  display:none;
+  overflow-y:auto;
+}
+#game-overlay.open{display:block;}
+.game-modal-inner{
+  max-width:620px;margin:0 auto;
+  padding:20px 20px 60px;
+  min-height:100vh;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:18px;
+}
+.modal-close{
+  position:fixed;top:20px;right:24px;
+  background:rgba(255,255,255,0.08);border:1px solid var(--border);
+  border-radius:12px;padding:10px 18px;
+  color:var(--text);font-family:'Syne',sans-serif;font-weight:700;
+  font-size:0.9rem;cursor:pointer;z-index:201;
+  transition:all 0.2s;
+}
+.modal-close:hover{background:rgba(255,255,255,0.14);}
+
+/* ===== GAME STYLES ===== */
+.g-header{text-align:center;}
+.g-header h2{
+  font-family:'Syne',sans-serif;font-weight:800;font-size:2.2rem;
+  background:linear-gradient(135deg,var(--c1),var(--c2),var(--c4),var(--c6));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.g-header p{color:var(--muted);font-size:0.85rem;margin-top:4px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;}
+
+.stats-bar{display:flex;gap:10px;width:100%;}
+.stat-chip{
+  flex:1;background:var(--card);border-radius:14px;
+  padding:12px 8px;text-align:center;border:1px solid var(--border);
+}
+.stat-val{font-family:'Syne',sans-serif;font-size:1.5rem;font-weight:800;line-height:1;}
+.stat-label{font-size:0.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;font-weight:700;margin-top:2px;}
+
+.level-badge-g{
+  background:linear-gradient(135deg,var(--c6),var(--c4));
+  border-radius:50px;padding:7px 22px;
+  font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;
+  box-shadow:0 0 18px var(--glow6);
+  animation:gpulse 2s ease infinite;
+}
+@keyframes gpulse{
+  0%,100%{box-shadow:0 0 18px var(--glow6);}
+  50%{box-shadow:0 0 36px var(--glow6);}
+}
+.streak-display{text-align:center;}
+.streak-num{font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;color:var(--c2);}
+
+.xp-section{width:100%;}
+.xp-header{display:flex;justify-content:space-between;font-size:0.72rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;}
+.xp-bar-bg{height:10px;background:rgba(255,255,255,0.06);border-radius:20px;overflow:hidden;}
+.xp-bar{height:100%;border-radius:20px;background:linear-gradient(90deg,var(--c6),var(--c4));transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1);box-shadow:0 0 10px var(--glow6);}
+
+.game-card{
+  width:100%;background:var(--card);border-radius:24px;
+  padding:24px;border:1px solid var(--border);
+  position:relative;overflow:hidden;
+}
+.game-card::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(circle at 80% 0,rgba(76,201,240,0.04),transparent 60%);
+}
+.cat-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  background:rgba(255,255,255,0.05);border-radius:8px;
+  padding:4px 12px;font-size:0.72rem;font-weight:700;
+  color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:14px;
+}
+.q-label{font-size:0.72rem;text-transform:uppercase;letter-spacing:2px;color:#555;font-weight:700;margin-bottom:8px;}
+.q-text{font-size:clamp(1rem,3vw,1.25rem);font-weight:700;line-height:1.45;margin-bottom:20px;min-height:60px;}
+
+.timer-wrap{margin-bottom:18px;}
+.timer-bar-bg{height:7px;background:rgba(255,255,255,0.07);border-radius:10px;overflow:hidden;}
+.timer-bar{height:100%;border-radius:10px;transition:width 0.1s linear,background 0.3s;background:linear-gradient(90deg,var(--c3),var(--c2));}
+.timer-text{font-family:'Syne',sans-serif;font-size:0.8rem;color:var(--muted);margin-top:3px;text-align:right;}
+
+.choice-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.choice-btn{
+  background:rgba(255,255,255,0.03);
+  border:2px solid rgba(255,255,255,0.08);
+  border-radius:16px;padding:16px 12px;
+  cursor:pointer;font-family:'Bricolage Grotesque',sans-serif;
+  font-size:0.92rem;font-weight:700;color:var(--text);
+  transition:all 0.18s cubic-bezier(0.34,1.56,0.64,1);
+  text-align:center;line-height:1.3;position:relative;overflow:hidden;
+}
+.choice-btn::before{content:'';position:absolute;inset:0;opacity:0;transition:opacity 0.2s;}
+.choice-btn.c0{border-color:rgba(255,87,87,0.4);}
+.choice-btn.c0::before{background:linear-gradient(135deg,rgba(255,87,87,0.1),transparent);}
+.choice-btn.c1{border-color:rgba(255,209,102,0.4);}
+.choice-btn.c1::before{background:linear-gradient(135deg,rgba(255,209,102,0.1),transparent);}
+.choice-btn.c2{border-color:rgba(76,201,240,0.4);}
+.choice-btn.c2::before{background:linear-gradient(135deg,rgba(76,201,240,0.1),transparent);}
+.choice-btn.c3{border-color:rgba(6,214,160,0.4);}
+.choice-btn.c3::before{background:linear-gradient(135deg,rgba(6,214,160,0.1),transparent);}
+.choice-btn:hover:not(:disabled){transform:scale(1.04) translateY(-2px);border-color:rgba(255,255,255,0.25);}
+.choice-btn:hover::before{opacity:1;}
+.choice-btn.correct{background:rgba(6,214,160,0.18);border-color:var(--c3)!important;transform:scale(1.06);animation:cb 0.35s cubic-bezier(0.34,1.56,0.64,1);}
+.choice-btn.wrong{background:rgba(255,87,87,0.15);border-color:var(--c1)!important;animation:shake 0.35s ease;}
+.choice-btn:disabled{cursor:default;}
+@keyframes cb{0%{transform:scale(1);}50%{transform:scale(1.1);}100%{transform:scale(1.06);}}
+@keyframes shake{0%,100%{transform:translateX(0);}25%{transform:translateX(-7px);}75%{transform:translateX(7px);}}
+.btn-emoji{display:block;font-size:1.4rem;margin-bottom:3px;}
+
+.feedback-overlay{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-size:2.8rem;border-radius:22px;pointer-events:none;opacity:0;z-index:10;transition:opacity 0.2s;
+}
+.feedback-overlay.show{opacity:1;animation:fbpop 0.4s cubic-bezier(0.34,1.56,0.64,1);}
+.feedback-overlay.cfb{background:rgba(6,214,160,0.12);}
+.feedback-overlay.wfb{background:rgba(255,87,87,0.08);}
+@keyframes fbpop{0%{transform:scale(0.2);opacity:0;}60%{transform:scale(1.15);}100%{transform:scale(1);opacity:1;}}
+
+.result-text{
+  font-family:'Syne',sans-serif;font-size:0.95rem;font-weight:700;
+  text-align:center;padding:12px 16px;border-radius:12px;
+  margin-top:4px;display:none;animation:slideup 0.3s ease;
+}
+.result-text.show{display:block;}
+.result-text.ok{color:var(--c3);background:rgba(6,214,160,0.08);}
+.result-text.ko{color:var(--c1);background:rgba(255,87,87,0.08);}
+@keyframes slideup{from{transform:translateY(8px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+
+.next-btn-g{
+  width:100%;padding:15px;border:none;border-radius:16px;
+  background:linear-gradient(135deg,var(--c4),var(--c6));
+  color:white;font-family:'Syne',sans-serif;font-weight:700;
+  font-size:1.1rem;cursor:pointer;
+  box-shadow:0 4px 18px rgba(76,201,240,0.25);
+  display:none;transition:all 0.2s cubic-bezier(0.34,1.56,0.64,1);
+}
+.next-btn-g:hover{transform:scale(1.03) translateY(-2px);}
+.next-btn-g.show{display:block;animation:popIn 0.35s cubic-bezier(0.34,1.56,0.64,1);}
+
+/* Reward popup in modal */
+.reward-popup-g{
+  position:fixed;top:50%;left:50%;
+  transform:translate(-50%,-50%) scale(0);
+  background:#13131F;border-radius:28px;
+  padding:36px 44px;text-align:center;z-index:210;
+  border:2px solid rgba(255,209,102,0.35);
+  box-shadow:0 0 60px rgba(255,209,102,0.15);
+  transition:transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
+  width:min(380px,90vw);
+}
+.reward-popup-g.show{transform:translate(-50%,-50%) scale(1);}
+.rwd-emoji{font-size:3.5rem;margin-bottom:8px;}
+.rwd-title{
+  font-family:'Syne',sans-serif;font-size:1.8rem;font-weight:800;
+  background:linear-gradient(135deg,var(--c2),var(--c5));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  margin-bottom:6px;
+}
+.rwd-desc{color:var(--muted);font-size:0.9rem;font-weight:500;margin-bottom:20px;line-height:1.5;}
+.rwd-close{
+  background:linear-gradient(135deg,var(--c2),var(--c5));
+  border:none;border-radius:12px;padding:12px 28px;
+  color:#07070F;font-family:'Syne',sans-serif;font-weight:800;
+  font-size:1rem;cursor:pointer;
+}
+.game-overlay-bg{
+  position:fixed;inset:0;background:rgba(0,0,0,0.7);
+  z-index:205;backdrop-filter:blur(6px);display:none;
+}
+.game-overlay-bg.show{display:block;}
+
+/* Confetti */
+.confetti-p{
+  position:fixed;width:9px;height:9px;border-radius:2px;
+  pointer-events:none;z-index:220;
+  animation:cfall linear forwards;
+}
+@keyframes cfall{
+  0%{transform:translateY(-20px) rotate(0);opacity:1;}
+  100%{transform:translateY(100vh) rotate(720deg);opacity:0;}
+}
+
+/* Intro screen in modal */
+.game-intro{
+  text-align:center;padding:20px 0;
+  animation:popIn 0.5s cubic-bezier(0.34,1.56,0.64,1);
+}
+.gi-icon{font-size:5rem;margin-bottom:10px;}
+.gi-title{
+  font-family:'Syne',sans-serif;font-weight:800;font-size:2.4rem;
+  background:linear-gradient(135deg,var(--c1),var(--c2),var(--c4));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  margin-bottom:12px;
+}
+.gi-desc{color:var(--muted);font-size:0.95rem;line-height:1.6;margin-bottom:28px;max-width:380px;}
+.gi-feats{
+  display:grid;grid-template-columns:1fr 1fr;gap:10px;
+  margin-bottom:28px;max-width:380px;
+}
+.gi-feat{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:14px;padding:14px;font-size:0.83rem;font-weight:600;
+}
+.gi-feat span{display:block;font-size:1.4rem;margin-bottom:4px;}
+.gi-start{
+  width:100%;max-width:360px;padding:17px;border:none;border-radius:18px;
+  background:linear-gradient(135deg,var(--c1),var(--c6));
+  color:white;font-family:'Syne',sans-serif;font-weight:800;
+  font-size:1.25rem;cursor:pointer;
+  box-shadow:0 8px 28px var(--glow1);
+  transition:all 0.25s cubic-bezier(0.34,1.56,0.64,1);
+}
+.gi-start:hover{transform:scale(1.05) translateY(-3px);}
+
+/* ===== FOOTER ===== */
+footer{
+  border-top:1px solid var(--border);
+  padding:50px 40px;
+  display:flex;align-items:center;justify-content:space-between;
+  flex-wrap:wrap;gap:20px;
+  position:relative;z-index:1;
+}
+.footer-logo{
+  font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;
+  background:linear-gradient(135deg,var(--c1),var(--c6));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.footer-desc{color:var(--muted);font-size:0.82rem;max-width:320px;line-height:1.5;}
+.footer-links{display:flex;gap:24px;flex-wrap:wrap;}
+.footer-links a{color:var(--muted);text-decoration:none;font-size:0.85rem;font-weight:500;transition:color 0.2s;}
+.footer-links a:hover{color:var(--text);}
+.footer-bottom{
+  width:100%;border-top:1px solid var(--border);
+  padding-top:20px;text-align:center;
+  color:var(--muted);font-size:0.78rem;
+}
+
+/* ===== ANIMATIONS ===== */
+@keyframes fadeUp{
+  from{transform:translateY(24px);opacity:0;}
+  to{transform:translateY(0);opacity:1;}
+}
+@keyframes popIn{
+  0%{transform:scale(0.85);opacity:0;}
+  100%{transform:scale(1);opacity:1;}
+}
+
+.reveal{
+  opacity:0;transform:translateY(30px);
+  transition:opacity 0.65s ease, transform 0.65s ease;
+}
+.reveal.visible{opacity:1;transform:translateY(0);}
+
+/* ===== RESPONSIVE ===== */
+@media(max-width:680px){
+  nav{padding:14px 20px;}
+  .nav-links{display:none;}
+  .hero-stats{gap:24px;}
+  .steps{flex-direction:column;align-items:center;}
+  .step::after{display:none;}
+  footer{flex-direction:column;text-align:center;}
+  .footer-links{justify-content:center;}
+}
+</style>
+</head>
+<body>
+
+<!-- Custom cursor -->
+<div id="cursor"></div>
+<div id="cursor-trail"></div>
+
+<!-- Background canvas -->
+<canvas id="bg-canvas"></canvas>
+
+<!-- ===== NAV ===== -->
+<nav>
+  <div class="nav-logo">🔮 IntuiSense</div>
+  <ul class="nav-links">
+    <li><a href="#features">Fonctions</a></li>
+    <li><a href="#how">Comment ça marche</a></li>
+    <li><a href="#levels">Niveaux</a></li>
+    <li><a href="#testimonials">Avis</a></li>
+  </ul>
+  <button class="nav-cta" onclick="openGame()">Jouer maintenant ✨</button>
+</nav>
+
+<!-- ===== HERO ===== -->
+<section id="hero">
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+  <div class="orb orb3"></div>
+  <div class="hero-eyebrow">✨ Entraînement cognitif et intuitif</div>
+  <h1 class="hero-title">
+    Teste ton<br>
+    <span>sixième sens.</span>
+  </h1>
+  <p class="hero-sub">IntuiSense est un jeu interactif qui mesure, entraîne et développe ton intuition grâce à des questions fascinantes sur les couleurs, les symboles, les nombres et les sensations.</p>
+  <div class="hero-btns">
+    <button class="btn-primary" onclick="openGame()">🚀 Jouer gratuitement</button>
+    <button class="btn-ghost" onclick="document.getElementById('features').scrollIntoView({behavior:'smooth'})">En savoir plus →</button>
+  </div>
+  <div class="hero-stats">
+    <div>
+      <div class="hero-stat-num">20+</div>
+      <div class="hero-stat-label">Questions</div>
+    </div>
+    <div>
+      <div class="hero-stat-num">7</div>
+      <div class="hero-stat-label">Niveaux</div>
+    </div>
+    <div>
+      <div class="hero-stat-num">∞</div>
+      <div class="hero-stat-label">Parties</div>
+    </div>
+    <div>
+      <div class="hero-stat-num">100%</div>
+      <div class="hero-stat-label">Gratuit</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FEATURES ===== -->
+<section id="features" style="padding:100px 24px;">
+  <div style="max-width:1100px;margin:0 auto;">
+    <div class="reveal" style="max-width:500px;">
+      <div class="section-label">🌟 Ce que tu vas découvrir</div>
+      <h2 class="section-title">Un jeu pensé pour l'éveil intérieur</h2>
+      <p class="section-desc">Chaque question t'invite à plonger dans tes ressentis profonds. C'est fun, rapide, et tu apprendras des choses fascinantes sur toi-même.</p>
+    </div>
+    <div class="features-grid">
+      <div class="feat-card reveal">
+        <div class="feat-icon">⚡</div>
+        <div class="feat-title">Minuterie 10 secondes</div>
+        <div class="feat-desc">Réponds vite — l'intuition pure se manifeste avant que le mental n'intervienne. Des bonus de rapidité récompensent tes instincts.</div>
+      </div>
+      <div class="feat-card reveal">
+        <div class="feat-icon">🔥</div>
+        <div class="feat-title">Système de série</div>
+        <div class="feat-desc">Enchaîne les bonnes réponses pour déclencher des multiplicateurs. Plus ta série est longue, plus tes points explosent.</div>
+      </div>
+      <div class="feat-card reveal">
+        <div class="feat-icon">🧠</div>
+        <div class="feat-title">Anecdotes fascinantes</div>
+        <div class="feat-desc">Chaque réponse révèle un fait scientifique ou spirituel surprenant sur l'intuition, la psychologie et la perception humaine.</div>
+      </div>
+      <div class="feat-card reveal">
+        <div class="feat-icon">🏆</div>
+        <div class="feat-title">Récompenses et surprises</div>
+        <div class="feat-desc">Des badges cachés et des récompenses spéciales débloquées selon ta précision et tes séries. Les confettis sont inclus!</div>
+      </div>
+      <div class="feat-card reveal">
+        <div class="feat-icon">📈</div>
+        <div class="feat-title">XP et progression</div>
+        <div class="feat-desc">Un système d'expérience complet avec 7 niveaux à débloquer, de Novice à Sage Suprême. Ta progression est trackée en temps réel.</div>
+      </div>
+      <div class="feat-card reveal">
+        <div class="feat-icon">🎨</div>
+        <div class="feat-title">5 catégories</div>
+        <div class="feat-desc">Couleurs, Nombres, Nature, Intuition et Symboles. Des thèmes variés pour explorer toutes les facettes de ton sixième sens.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== HOW IT WORKS ===== -->
+<section id="how">
+  <div class="reveal section-label" style="text-align:center;">🎯 Simple comme bonjour</div>
+  <h2 class="section-title reveal" style="text-align:center;">Comment ça fonctionne</h2>
+  <div class="steps">
+    <div class="step reveal">
+      <div class="step-num">1</div>
+      <div class="step-title">Lis la question</div>
+      <div class="step-desc">Une question sur tes ressentis intuitifs apparaît avec un timer de 10 secondes.</div>
+    </div>
+    <div class="step reveal">
+      <div class="step-num">2</div>
+      <div class="step-title">Fais confiance à ton instinct</div>
+      <div class="step-desc">Choisis la réponse qui te "sonne" juste — sans trop réfléchir!</div>
+    </div>
+    <div class="step reveal">
+      <div class="step-num">3</div>
+      <div class="step-title">Découvre la vérité</div>
+      <div class="step-desc">Lis l'anecdote fascinante qui explique la bonne réponse.</div>
+    </div>
+    <div class="step reveal">
+      <div class="step-num">4</div>
+      <div class="step-title">Monte en niveau</div>
+      <div class="step-desc">Accumule de l'XP, débloque des badges et atteins le rang de Sage Suprême!</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== LEVELS ===== -->
+<section id="levels" style="padding:80px 24px;">
+  <div style="max-width:900px;margin:0 auto;">
+    <div style="text-align:center;">
+      <div class="reveal section-label">⬆️ Ta progression</div>
+      <h2 class="section-title reveal" style="text-align:center;">7 niveaux à conquérir</h2>
+      <p class="section-desc reveal" style="text-align:center;margin:0 auto;">Chaque bonne réponse te rapproche du rang suprême. Jusqu'où iras-tu?</p>
+    </div>
+    <div class="levels-grid">
+      <div class="level-card reveal"><div class="lv-icon">🌱</div><div class="lv-name">Novice</div><div class="lv-xp">0 XP</div></div>
+      <div class="level-card reveal"><div class="lv-icon">⚡</div><div class="lv-name">Éveillé</div><div class="lv-xp">100 XP</div></div>
+      <div class="level-card reveal"><div class="lv-icon">🔮</div><div class="lv-name">Intuitif</div><div class="lv-xp">250 XP</div></div>
+      <div class="level-card reveal"><div class="lv-icon">🌙</div><div class="lv-name">Sensitif</div><div class="lv-xp">500 XP</div></div>
+      <div class="level-card reveal"><div class="lv-icon">🌟</div><div class="lv-name">Visionnaire</div><div class="lv-xp">800 XP</div></div>
+      <div class="level-card reveal"><div class="lv-icon">🦋</div><div class="lv-name">Maître</div><div class="lv-xp">1200 XP</div></div>
+      <div class="level-card reveal" style="border-color:rgba(155,93,229,0.35);"><div class="lv-icon">✨</div><div class="lv-name">Sage Suprême</div><div class="lv-xp">2000 XP</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== TESTIMONIALS ===== -->
+<section id="testimonials" style="padding:80px 0;">
+  <div style="text-align:center;padding:0 24px;margin-bottom:40px;">
+    <div class="reveal section-label">💬 Ce qu'ils disent</div>
+    <h2 class="section-title reveal">Les joueurs adorent</h2>
+  </div>
+  <div style="overflow:hidden;">
+    <div class="testi-track">
+      <!-- Set A -->
+      <div class="testi-card"><div class="testi-stars">★★★★★</div><div class="testi-text">"J'ai appris que mon 'gut feeling' est scientifiquement prouvé! Je joue tous les matins pour aiguiser mon intuition."</div><div class="testi-author"><div class="testi-avatar" style="background:rgba(255,87,87,0.15);">🦁</div><div><div class="testi-name">Marie-Pier L.</div><div class="testi-handle">Sage Suprême ✨</div></div></div></div>
+      <div class="testi-card"><div class="testi-stars">★★★★★</div><div class="testi-text">"Je croyais pas à l'intuition avant. Maintenant j'ai 78% de précision et je comprends pourquoi mes premières impressions sont souvent bonnes!"</div><div class="testi-author"><div class="testi-avatar" style="background:rgba(255,209,102,0.15);">🐯</div><div><div class="testi-name">Jonathan B.</div><div class="testi-handle">Visionnaire 🌟</div></div></div></div>
+      <div class="testi-card"><div class="testi-stars">★★★★★</div><div class="testi-text">"Les anecdotes après chaque question sont gold! J'ai appris plus de choses en 10 minutes qu'en lisant un livre."</div><div class="testi-author"><div class="testi-avatar" style="background:rgba(6,214,160,0.15);">🦊</div><div><div class="testi-name">Sophie G.</div><div class="testi-handle">Maître 🦋</div></div></div></div>
+      <div class="testi-card"><div class="testi-stars">★★★★☆</div><div class="testi-text">"Mon record c'est 9 bonnes réponses de suite. Les confettis qui explosent c'est satisfaisant en maudit!"</div><div class="testi-author"><div class="testi-avatar" style="background:rgba(76,201,240,0.15);">🐺</div><div><div class="testi-name">Guillaume T.</div><div class="testi-handle">Sensitif 🌙</div></div></div></div>
+      <div class="testi-card"><div class="testi-stars">★★★★★</div><div class="testi-text">"Super design, questions super intéressantes, et j'adore le système de progression. Addictif comme du bon bonbon!"</div><div class="testi-author"><div class="testi-avatar" style="background:rgba(155,93,229,0.15);">🦄</div><div><div class="testi-name">Camille D.</div><div class="testi-handle">Intuitif 🔮</div></div></div></div>
+      <div class="testi-card"><div class="testi-stars">★★★★★</div><div class="testi-text">"Je joue avec mes kids, c'est devenu un rituel du soir. Ils adorent les questions sur les couleurs et les animaux!"</div><div class="testi-author"><div class="testi-avatar" style="background:rgba(247,127,0,0.15);">🐻</div><div><div class="testi-name">Patrick R.</div><div class="testi-handle">Éveillé ⚡</div></div></div></div>
+      <!-- Set B (duplicate for infinite scroll) -->
+      <div class="testi-card"><div class="testi-stars">★★★★★</div><div class="testi-text">"J'ai appris que mon 'gut feeling' est scientifiquement prouvé! Je joue tous les matins pour aiguiser mon intuition."</div><div class="testi-author"><div class="testi-avatar" style="background:rgba(255,87,87,0.15);">🦁</div><div><div class="testi-name">Marie-Pier L.</div><div class="testi-handle">Sage Suprême ✨</div></div></div></div>
+      <div class="testi-card"><div class="testi-stars">★★★★★</div><div class="testi-text">"Je croyais pas à l'intuition avant. Maintenant j'ai 78% de précision et je comprends pourquoi mes premières impressions sont souvent bonnes!"</div><div class="testi-author"><div class="testi-avatar" style="background:rgba(255,209,102,0.15);">🐯</div><div><div class="testi-name">Jonathan B.</div><div class="testi-handle">Visionnaire 🌟</div></div></div></div>
+      <div class="testi-card"><div class="testi-stars">★★★★★</div><div class="testi-text">"Les anecdotes après chaque question sont gold! J'ai appris plus de choses en 10 minutes qu'en lisant un livre."</div><div class="testi-author"><div class="testi-avatar" style="background:rgba(6,214,160,0.15);">🦊</div><div><div class="testi-name">Sophie G.</div><div class="testi-handle">Maître 🦋</div></div></div></div>
+      <div class="testi-card"><div class="testi-stars">★★★★☆</div><div class="testi-text">"Mon record c'est 9 bonnes réponses de suite. Les confettis qui explosent c'est satisfaisant en maudit!"</div><div class="testi-author"><div class="testi-avatar" style="background:rgba(76,201,240,0.15);">🐺</div><div><div class="testi-name">Guillaume T.</div><div class="testi-handle">Sensitif 🌙</div></div></div></div>
+      <div class="testi-card"><div class="testi-stars">★★★★★</div><div class="testi-text">"Super design, questions super intéressantes, et j'adore le système de progression. Addictif comme du bon bonbon!"</div><div class="testi-author"><div class="testi-avatar" style="background:rgba(155,93,229,0.15);">🦄</div><div><div class="testi-name">Camille D.</div><div class="testi-handle">Intuitif 🔮</div></div></div></div>
+      <div class="testi-card"><div class="testi-stars">★★★★★</div><div class="testi-text">"Je joue avec mes kids, c'est devenu un rituel du soir. Ils adorent les questions sur les couleurs et les animaux!"</div><div class="testi-author"><div class="testi-avatar" style="background:rgba(247,127,0,0.15);">🐻</div><div><div class="testi-name">Patrick R.</div><div class="testi-handle">Éveillé ⚡</div></div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== CTA ===== -->
+<section id="cta">
+  <div class="cta-box reveal">
+    <div class="cta-emoji">🔮</div>
+    <h2 class="cta-title">Prêt à découvrir<br>ton vrai potentiel?</h2>
+    <p class="cta-desc">C'est gratuit, ça prend 2 minutes, et tu pourrais te surprendre toi-même. Ton intuition n'attend que toi.</p>
+    <button class="btn-primary" style="font-size:1.15rem;padding:18px 42px;" onclick="openGame()">✨ Commencer maintenant — c'est gratuit</button>
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer>
+  <div>
+    <div class="footer-logo">🔮 IntuiSense</div>
+    <div class="footer-desc" style="margin-top:8px;">L'entraîneur d'intuition le plus coloré et le plus fun du web. Développe ton sixième sens, une question à la fois.</div>
+  </div>
+  <div class="footer-links">
+    <a href="#hero">Accueil</a>
+    <a href="#features">Fonctions</a>
+    <a href="#how">Comment ça marche</a>
+    <a href="#levels">Niveaux</a>
+    <a href="#" onclick="openGame();return false;">Jouer ✨</a>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2025 IntuiSense — Fait avec 💜 et beaucoup d'intuition</p>
+  </div>
+</footer>
+
+<!-- ===== GAME OVERLAY ===== -->
+<div id="game-overlay">
+  <button class="modal-close" onclick="closeGame()">✕ Fermer</button>
+  <div class="game-modal-inner" id="game-inner">
+
+    <!-- Intro -->
+    <div class="game-intro" id="g-intro">
+      <div class="gi-icon">🔮</div>
+      <div class="gi-title">IntuiSense</div>
+      <p class="gi-desc">Teste ton intuition sur les couleurs, les nombres, la nature et les symboles. Plus tu joues, plus tu t'affines!</p>
+      <div class="gi-feats">
+        <div class="gi-feat"><span>⚡</span>Réponse rapide</div>
+        <div class="gi-feat"><span>🧠</span>Intuition pure</div>
+        <div class="gi-feat"><span>🎯</span>Stats détaillées</div>
+        <div class="gi-feat"><span>🏆</span>Récompenses</div>
+      </div>
+      <button class="gi-start" onclick="startGame()">✨ Commencer l'aventure</button>
+    </div>
+
+    <!-- Game UI (hidden until start) -->
+    <div id="g-game" style="display:none;width:100%;display:none;flex-direction:column;align-items:center;gap:16px;">
+      <div class="g-header">
+        <h2>🔮 IntuiSense</h2>
+        <p>Entraîneur d'intuition</p>
+      </div>
+
+      <div class="stats-bar">
+        <div class="stat-chip"><div class="stat-val" id="g-score" style="color:var(--c1)">0</div><div class="stat-label">Score</div></div>
+        <div class="stat-chip"><div class="stat-val" id="g-correct" style="color:var(--c3)">0</div><div class="stat-label">Bons</div></div>
+        <div class="stat-chip"><div class="stat-val" id="g-total" style="color:var(--c2)">0</div><div class="stat-label">Total</div></div>
+        <div class="stat-chip"><div class="stat-val" id="g-pct" style="color:var(--c4)">—</div><div class="stat-label">Précision</div></div>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:12px;width:100%;">
+        <div class="level-badge-g" id="g-level">🌱 Novice</div>
+        <div class="streak-display">
+          <span style="font-size:1.3rem;">🔥</span>
+          <span class="streak-num" id="g-streak">0</span>
+          <span style="font-size:0.72rem;color:var(--muted);font-weight:700;"> en série</span>
+        </div>
+      </div>
+
+      <div class="xp-section">
+        <div class="xp-header"><span>✨ Expérience</span><span id="g-xp-text">0 / 100 XP</span></div>
+        <div class="xp-bar-bg"><div class="xp-bar" id="g-xp-bar" style="width:0%"></div></div>
+      </div>
+
+      <div class="game-card" id="g-card">
+        <div class="feedback-overlay" id="g-feedback"></div>
+        <div class="cat-badge" id="g-cat">🌟 Chargement...</div>
+        <div class="q-label">Question <span id="g-qnum">1</span></div>
+        <div class="q-text" id="g-qtext">Chargement...</div>
+        <div class="timer-wrap">
+          <div class="timer-bar-bg"><div class="timer-bar" id="g-tbar"></div></div>
+          <div class="timer-text" id="g-ttext">⏱ 10s</div>
+        </div>
+        <div class="choice-grid" id="g-choices"></div>
+        <div class="result-text" id="g-result"></div>
+      </div>
+
+      <button class="next-btn-g" id="g-next" onclick="nextQ()">Prochaine question →</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- Reward popup -->
+<div class="game-overlay-bg" id="g-overlay-bg" onclick="closeRwd()"></div>
+<div class="reward-popup-g" id="g-rwd">
+  <div class="rwd-emoji" id="rwd-emoji">🏆</div>
+  <div class="rwd-title" id="rwd-title">Niveau up!</div>
+  <div class="rwd-desc" id="rwd-desc">Incroyable!</div>
+  <button class="rwd-close" onclick="closeRwd()">🎉 Continuer!</button>
+</div>
+
+<script>
+// ===== CURSOR =====
+const cur = document.getElementById('cursor');
+const trail = document.getElementById('cursor-trail');
+let mx=0,my=0,tx=0,ty=0;
+document.addEventListener('mousemove',e=>{
+  mx=e.clientX; my=e.clientY;
+  cur.style.transform=`translate(${mx}px,${my}px) translate(-50%,-50%)`;
+});
+setInterval(()=>{
+  tx+=(mx-tx)*0.18; ty+=(my-ty)*0.18;
+  trail.style.transform=`translate(${tx}px,${ty}px) translate(-50%,-50%)`;
+},16);
+document.querySelectorAll('a,button').forEach(el=>{
+  el.addEventListener('mouseenter',()=>cur.style.transform=cur.style.transform.replace('scale(1)','')+'scale(2.5)');
+  el.addEventListener('mouseleave',()=>{});
+});
+
+// ===== BG CANVAS =====
+const canvas=document.getElementById('bg-canvas');
+const ctx=canvas.getContext('2d');
+let W,H,stars=[];
+function initCanvas(){
+  W=canvas.width=window.innerWidth;
+  H=canvas.height=window.innerHeight;
+  stars=[];
+  for(let i=0;i<120;i++){
+    stars.push({x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.5+0.3,
+      vx:(Math.random()-0.5)*0.2,vy:(Math.random()-0.5)*0.2,
+      a:Math.random(),da:Math.random()*0.008+0.002});
+  }
+}
+function drawCanvas(){
+  ctx.clearRect(0,0,W,H);
+  stars.forEach(s=>{
+    s.x+=s.vx; s.y+=s.vy;
+    s.a+=s.da;
+    if(s.a>1||s.a<0) s.da*=-1;
+    if(s.x<0)s.x=W; if(s.x>W)s.x=0;
+    if(s.y<0)s.y=H; if(s.y>H)s.y=0;
+    ctx.beginPath();
+    ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+    ctx.fillStyle=`rgba(255,255,255,${s.a*0.5})`;
+    ctx.fill();
+  });
+  requestAnimationFrame(drawCanvas);
+}
+window.addEventListener('resize',initCanvas);
+initCanvas(); drawCanvas();
+
+// ===== SCROLL REVEAL =====
+const revEls=document.querySelectorAll('.reveal');
+const obs=new IntersectionObserver(entries=>{
+  entries.forEach((e,i)=>{
+    if(e.isIntersecting){
+      setTimeout(()=>e.target.classList.add('visible'),i*80);
+      obs.unobserve(e.target);
+    }
+  });
+},{threshold:0.12});
+revEls.forEach(el=>obs.observe(el));
+
+// ===== GAME OVERLAY =====
+function openGame(){
+  document.getElementById('game-overlay').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeGame(){
+  document.getElementById('game-overlay').classList.remove('open');
+  document.body.style.overflow='';
+}
+
+// ===== GAME LOGIC =====
+const questions=[
+  {cat:"🎨 Couleurs",emoji:"🔴",q:"Si tu fermes les yeux et penses à de l'énergie… quelle couleur vois-tu ?",choices:["Rouge vif","Bleu calme","Vert nature","Violet mystère"],answer:0,note:"Le rouge est la couleur de l'énergie vitale dans de nombreuses traditions!"},
+  {cat:"🎨 Couleurs",emoji:"💙",q:"Quelle couleur est associée à l'intuition et la sagesse intérieure ?",choices:["Jaune","Orange","Indigo","Rose"],answer:2,note:"L'indigo est lié au 6e chakra — le fameux 'troisième oeil' de l'intuition!"},
+  {cat:"🎨 Couleurs",emoji:"🟡",q:"Tu reçois une bonne nouvelle. Quelle couleur ressens-tu ?",choices:["Gris","Doré/Jaune","Bordeaux","Brun"],answer:1,note:"Le jaune doré est universellement associé à la joie et au bonheur!"},
+  {cat:"🎨 Couleurs",emoji:"🌈",q:"Quelle couleur calme le plus l'esprit anxieux selon la chromothérapie ?",choices:["Rouge","Blanc","Bleu","Noir"],answer:2,note:"Le bleu abaisse la tension artérielle et réduit le stress — utilisé en thérapie!"},
+  {cat:"🔢 Nombres",emoji:"✨",q:"Quel chiffre est le plus souvent choisi 'au hasard' entre 1 et 10 ?",choices:["3","5","7","9"],answer:2,note:"Le 7 est choisi par ~30% des gens — c'est le nombre préféré de l'humanité!"},
+  {cat:"🔢 Nombres",emoji:"🎲",q:"Pense à un nombre de 1 à 4. Lequel viens-tu de penser ?",choices:["1","2","3","4"],answer:2,note:"Le 3 est statistiquement le plus choisi! Avais-tu pensé au 3?"},
+  {cat:"🔢 Nombres",emoji:"🌙",q:"Quel nombre est considéré comme le plus 'mystique' dans de nombreuses cultures ?",choices:["5","8","13","12"],answer:2,note:"Le 13 est entouré de mystère dans presque toutes les cultures du monde!"},
+  {cat:"🔢 Nombres",emoji:"🌟",q:"Quelle heure est la plus souvent remarquée sur une horloge par les gens intuitifs ?",choices:["11:11","10:10","12:12","3:33"],answer:0,note:"Le 11:11 est le plus remarqué — certains y voient un signe de synchronicité!"},
+  {cat:"🌿 Nature",emoji:"🦋",q:"Quel animal symbolise la transformation de l'âme dans le monde entier ?",choices:["L'aigle","Le loup","Le papillon","La tortue"],answer:2,note:"Le papillon représente la métamorphose dans presque toutes les cultures!"},
+  {cat:"🌿 Nature",emoji:"🌊",q:"Quelle phase de la lune est associée à l'intuition maximale selon la tradition ?",choices:["Nouvelle lune","Premier quartier","Pleine lune","Dernier quartier"],answer:2,note:"La pleine lune amplifie les émotions et l'intuition selon de nombreuses traditions!"},
+  {cat:"🌿 Nature",emoji:"🌸",q:"Quelle saison est la plus propice à écouter son intuition selon les traditions ?",choices:["Printemps","Été","Automne","Hiver"],answer:3,note:"L'hiver, avec son calme et sa noirceur, favorise l'introspection et l'intuition!"},
+  {cat:"🌿 Nature",emoji:"🔥",q:"Quel élément est associé à l'instinct immédiat dans la philosophie orientale ?",choices:["L'eau","Le feu","La terre","L'air"],answer:1,note:"Le feu représente l'instinct, l'action immédiate et la passion!"},
+  {cat:"✨ Intuition",emoji:"💭",q:"Où ressens-tu ton intuition dans ton corps en premier ?",choices:["Dans la tête","Dans le ventre","Dans le cœur","Dans les mains"],answer:1,note:"Le 'gut feeling' (ventre) est prouvé — on a 100M neurones dans l'intestin!"},
+  {cat:"✨ Intuition",emoji:"🌀",q:"Quel sens est le plus lié à la mémoire émotionnelle et intuitive ?",choices:["La vue","Le toucher","L'odorat","L'ouïe"],answer:2,note:"L'olfactif est directement connecté au système limbique — le centre émotionnel!"},
+  {cat:"✨ Intuition",emoji:"⚡",q:"La première impression que tu as d'une personne est correcte dans quel pourcentage ?",choices:["~20%","~40%","~60%","~80%"],answer:3,note:"Des études montrent que nos premières impressions sont fiables à ~76-85%!"},
+  {cat:"✨ Intuition",emoji:"🎴",q:"Quelle heure est généralement la meilleure pour écouter son intuition ?",choices:["6h du matin","14h l'après-midi","22h le soir","3h du matin"],answer:0,note:"Au réveil, le cerveau est en état alpha/thêta, idéal pour l'intuition!"},
+  {cat:"🔮 Symboles",emoji:"🦅",q:"Quel oiseau est le symbole universel de la vision et de la clairvoyance ?",choices:["Le corbeau","Le hibou","L'aigle","Le paon"],answer:2,note:"L'aigle voit 4 à 8 fois mieux que l'humain — symbole de vision supérieure!"},
+  {cat:"🔮 Symboles",emoji:"💎",q:"Quelle gemme est la plus utilisée pour amplifier l'intuition en lithothérapie ?",choices:["Le rubis","L'améthyste","L'émeraude","Le topaze"],answer:1,note:"L'améthyste violette est depuis l'Antiquité associée à la sagesse et l'intuition!"},
+  {cat:"🔮 Symboles",emoji:"🌀",q:"Qu'est-ce que la synchronicité selon Carl Jung ?",choices:["Un hasard ordinaire","Des coïncidences significatives","Un rêve prémonitoire","Une erreur de perception"],answer:1,note:"Jung décrivait la synchronicité comme des coïncidences trop significatives pour être du hasard!"},
+  {cat:"🔮 Symboles",emoji:"🌙",q:"Dans quel état mental accède-t-on le plus facilement à l'intuition profonde ?",choices:["Stress intense","État alpha relaxé","Concentration maximale","Fatigue extrême"],answer:1,note:"L'état alpha (8-12Hz) est l'état de relaxation créative — porte vers l'intuition!"},
+];
+const levels=[
+  {name:"🌱 Novice",xp:0},{name:"⚡ Éveillé",xp:100},{name:"🔮 Intuitif",xp:250},
+  {name:"🌙 Sensitif",xp:500},{name:"🌟 Visionnaire",xp:800},
+  {name:"🦋 Maître",xp:1200},{name:"✨ Sage Suprême",xp:2000}
+];
+
+let gs={score:0,correct:0,total:0,streak:0,xp:0,level:0,rewards:new Set(),answered:false,timer:null,timeLeft:0,qi:0};
+let shuffled=[];
+
+function shuffle(a){return[...a].sort(()=>Math.random()-0.5);}
+
+function startGame(){
+  document.getElementById('g-intro').style.display='none';
+  const gg=document.getElementById('g-game');
+  gg.style.display='flex';
+  shuffled=shuffle(questions); gs.qi=0;
+  loadQ();
+}
+
+function loadQ(){
+  if(gs.qi>=shuffled.length){shuffled=shuffle(questions);gs.qi=0;}
+  const q=shuffled[gs.qi]; gs.currentQ=q; gs.answered=false;
+  gs.total++;
+  document.getElementById('g-qnum').textContent=gs.total;
+  document.getElementById('g-cat').textContent=q.cat;
+  document.getElementById('g-qtext').textContent=q.emoji+' '+q.q;
+  const grid=document.getElementById('g-choices');
+  grid.innerHTML='';
+  ['c0','c1','c2','c3'].forEach((cls,i)=>{
+    const btn=document.createElement('button');
+    btn.className='choice-btn '+cls;
+    btn.innerHTML=`<span class="btn-emoji">${['🔴','🟡','🔵','🟢'][i]}</span>${q.choices[i]}`;
+    btn.onclick=()=>doAnswer(i);
+    grid.appendChild(btn);
+  });
+  const fb=document.getElementById('g-feedback');
+  fb.className='feedback-overlay'; fb.textContent='';
+  const rt=document.getElementById('g-result');
+  rt.className='result-text'; rt.textContent='';
+  document.getElementById('g-next').classList.remove('show');
+  document.getElementById('g-total').textContent=gs.total;
+  startTimer(10);
+}
+
+function startTimer(sec){
+  clearInterval(gs.timer); gs.timeLeft=sec; updateTimer();
+  gs.timer=setInterval(()=>{
+    gs.timeLeft-=0.1; updateTimer();
+    if(gs.timeLeft<=0){clearInterval(gs.timer);if(!gs.answered)timeOut();}
+  },100);
+}
+
+function updateTimer(){
+  const pct=Math.max(0,(gs.timeLeft/10)*100);
+  const bar=document.getElementById('g-tbar');
+  bar.style.width=pct+'%';
+  if(pct>50) bar.style.background='linear-gradient(90deg,#06D6A0,#FFD166)';
+  else if(pct>25) bar.style.background='linear-gradient(90deg,#FFD166,#F77F00)';
+  else bar.style.background='linear-gradient(90deg,#F77F00,#FF5757)';
+  document.getElementById('g-ttext').textContent='⏱ '+Math.max(0,Math.ceil(gs.timeLeft))+'s';
+}
+
+function doAnswer(idx){
+  if(gs.answered)return;
+  gs.answered=true; clearInterval(gs.timer);
+  const q=gs.currentQ;
+  const btns=document.querySelectorAll('#g-choices .choice-btn');
+  btns.forEach(b=>b.disabled=true);
+  const ok=idx===q.answer;
+  btns[idx].classList.add(ok?'correct':'wrong');
+  if(!ok)btns[q.answer].classList.add('correct');
+  const fb=document.getElementById('g-feedback');
+  if(ok){
+    gs.correct++; gs.streak++;
+    const tb=Math.round(gs.timeLeft);
+    const sb=Math.min(gs.streak-1,5)*5;
+    const pts=10+tb+sb;
+    gs.score+=pts; gs.xp+=pts;
+    fb.textContent='✅'; fb.className='feedback-overlay cfb show';
+    showResult(true,`+${pts} pts! ${tb>5?'⚡ Rapide!':''} ${gs.streak>1?'🔥 Série de '+gs.streak+'!':''}`,q.note);
+  } else {
+    gs.streak=0;
+    fb.textContent='❌'; fb.className='feedback-overlay wfb show';
+    showResult(false,'😅 Pas tout à fait... La bonne réponse: '+q.choices[q.answer],q.note);
+  }
+  updateStats(); checkRwds();
+  setTimeout(()=>{ const f=document.getElementById('g-feedback'); f.classList.remove('show'); },800);
+  document.getElementById('g-next').classList.add('show');
+}
+
+function timeOut(){
+  if(gs.answered)return; gs.answered=true; gs.streak=0;
+  const btns=document.querySelectorAll('#g-choices .choice-btn');
+  btns.forEach(b=>b.disabled=true);
+  btns[gs.currentQ.answer].classList.add('correct');
+  showResult(false,'⏰ Temps écoulé! La bonne réponse: '+gs.currentQ.choices[gs.currentQ.answer],gs.currentQ.note);
+  updateStats();
+  document.getElementById('g-next').classList.add('show');
+}
+
+function showResult(ok,msg,note){
+  const rt=document.getElementById('g-result');
+  rt.className='result-text show '+(ok?'ok':'ko');
+  rt.textContent=msg+(note?' — '+note:'');
+}
+
+function updateStats(){
+  document.getElementById('g-score').textContent=gs.score;
+  document.getElementById('g-correct').textContent=gs.correct;
+  document.getElementById('g-total').textContent=gs.total;
+  const pct=Math.round((gs.correct/gs.total)*100);
+  document.getElementById('g-pct').textContent=pct+'%';
+  document.getElementById('g-streak').textContent=gs.streak;
+  const nextLv=Math.min(gs.level+1,levels.length-1);
+  const xpCur=levels[gs.level].xp;
+  const xpNext=levels[nextLv].xp;
+  const range=xpNext-xpCur;
+  const prog=range>0?Math.min(100,((gs.xp-xpCur)/range)*100):100;
+  document.getElementById('g-xp-bar').style.width=prog+'%';
+  document.getElementById('g-xp-text').textContent=gs.xp+' / '+xpNext+' XP';
+  let nl=gs.level;
+  for(let i=levels.length-1;i>=0;i--){if(gs.xp>=levels[i].xp){nl=i;break;}}
+  if(nl>gs.level){gs.level=nl;document.getElementById('g-level').textContent=levels[gs.level].name;setTimeout(()=>showRwd('🏆','Niveau supérieur!',levels[gs.level].name+' — tu progresses!'),500);}
+  else document.getElementById('g-level').textContent=levels[gs.level].name;
+}
+
+function checkRwds(){
+  const pct=Math.round((gs.correct/gs.total)*100);
+  if(!gs.rewards.has('first')&&gs.total===1&&gs.correct===1){gs.rewards.add('first');setTimeout(()=>showRwd('⚡','Premier pas!','Ton aventure intuitive commence!'),1200);}
+  if(!gs.rewards.has('s3')&&gs.streak===3){gs.rewards.add('s3');setTimeout(()=>showRwd('🔥','En feu!','3 bonnes réponses d\'affilée!'),1200);}
+  if(!gs.rewards.has('s5')&&gs.streak===5){gs.rewards.add('s5');setTimeout(()=>showRwd('🎯','Série de 5!','Ton intuition est en ébullition!'),1200);}
+  if(!gs.rewards.has('s10')&&gs.streak===10){gs.rewards.add('s10');setTimeout(()=>showRwd('🌟','Série de 10!','Tu es un oracle!'),1200);}
+  if(!gs.rewards.has('p70')&&pct>=70&&gs.total>=5){gs.rewards.add('p70');setTimeout(()=>showRwd('💫','70% de précision!','Ton intuition est bien aiguisée!'),1200);}
+  if(!gs.rewards.has('p85')&&pct>=85&&gs.total>=10){gs.rewards.add('p85');setTimeout(()=>showRwd('🌙','85% de précision!','Tu touches au génie intuitif!'),1200);}
+}
+
+function showRwd(emoji,title,desc){
+  document.getElementById('rwd-emoji').textContent=emoji;
+  document.getElementById('rwd-title').textContent=title;
+  document.getElementById('rwd-desc').textContent=desc;
+  document.getElementById('g-rwd').classList.add('show');
+  document.getElementById('g-overlay-bg').classList.add('show');
+  confetti();
+}
+function closeRwd(){
+  document.getElementById('g-rwd').classList.remove('show');
+  document.getElementById('g-overlay-bg').classList.remove('show');
+}
+function confetti(){
+  const cols=['#FF5757','#FFD166','#06D6A0','#4CC9F0','#F77F00','#9B5DE5','#FF69B4'];
+  for(let i=0;i<70;i++){
+    const c=document.createElement('div');
+    c.className='confetti-p';
+    const sz=Math.random()*10+5;
+    c.style.cssText=`left:${Math.random()*100}%;top:0;background:${cols[Math.floor(Math.random()*cols.length)]};animation-duration:${Math.random()*2+1.5}s;animation-delay:${Math.random()*0.5}s;width:${sz}px;height:${sz}px;border-radius:${Math.random()>0.5?'50%':'2px'};`;
+    document.body.appendChild(c);
+    setTimeout(()=>c.remove(),3000);
+  }
+}
+function nextQ(){gs.qi++;loadQ();}
+</script>
+</body>
+</html>
